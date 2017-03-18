@@ -31,7 +31,8 @@ import okhttp3.Callback;
 import okhttp3.Response;
 
 
-/**遍历省市县数据的碎片
+/**
+ * 遍历省市县数据的碎片
  * A simple {@link Fragment} subclass.
  */
 public class ChooseAreaFragment extends Fragment {
@@ -88,8 +89,7 @@ public class ChooseAreaFragment extends Fragment {
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.choose_area, container, false);
         titleText = (TextView) view.findViewById(R.id.title_text);
         backButton = (Button) view.findViewById(R.id.back_button);
@@ -114,7 +114,7 @@ public class ChooseAreaFragment extends Fragment {
                 } else if (currentLevel == LEVEL_CITY) {
                     selectedCity = cityList.get(position);
                     queryCounties();
-                }else if (currentLevel == LEVEL_COUNTY) {
+                } else if (currentLevel == LEVEL_COUNTY) {
                     String weatherId = countyList.get(position).getWeatherId();
                     if (getActivity() instanceof MainActivity) {
                         Intent intent = new Intent(getActivity(), WeatherActivity.class);
@@ -123,8 +123,8 @@ public class ChooseAreaFragment extends Fragment {
                         getActivity().finish();
                     } else if (getActivity() instanceof WeatherActivity) {
                         WeatherActivity activity = (WeatherActivity) getActivity();
-//                        activity.drawerLayout.closeDrawers();
-//                        activity.swipeRefresh.setRefreshing(true);
+                        activity.drawerLayout.closeDrawers();
+                        activity.swipeRefresh.setRefreshing(true);
                         activity.requestWeather(weatherId);
                     }
                 }
@@ -135,7 +135,7 @@ public class ChooseAreaFragment extends Fragment {
             public void onClick(View v) {
                 if (currentLevel == LEVEL_COUNTY) {
                     queryCities();
-                } else if (currentLevel == LEVEL_CITY){
+                } else if (currentLevel == LEVEL_CITY) {
                     queryProvinces();
                 }
             }
@@ -191,6 +191,7 @@ public class ChooseAreaFragment extends Fragment {
             queryFromServer(address, "city");
         }
     }
+
     /**
      * 查询选中市区内的所有的县，优先从数据库查询，如果没有查询到再去服务器查询
      */
@@ -216,6 +217,7 @@ public class ChooseAreaFragment extends Fragment {
 
     /**
      * 根据传入的地址和类型从服务器上查询省市县数据
+     *
      * @param address
      * @param type
      */
@@ -223,20 +225,20 @@ public class ChooseAreaFragment extends Fragment {
         showProgressDialog();
         //调用HttpUtil的sendOkHttpRequest方法，向服务器发送请求
         HttpUtil.sendOkHttpRequest(address, new Callback() {
-			//响应的数据
+            //响应的数据
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String responseText = response.body().string();
-                    boolean result = false;
+                boolean result = false;
                 if ("province".equals(type)) {
                     result = Utility.handleProvinceResponse(responseText);
-                } else if("city".equals(type)){
+                } else if ("city".equals(type)) {
                     result = Utility.handleCityResponse(responseText, selectedProvince.getId());
-                } else if("county".equals(type)){
+                } else if ("county".equals(type)) {
                     result = Utility.handleCountyResponse(responseText, selectedCity.getId());
                 }
 
-                if (result){
+                if (result) {
 
                     //从子线程切换到主线程进行UI操作
                     getActivity().runOnUiThread(new Runnable() {
@@ -245,7 +247,7 @@ public class ChooseAreaFragment extends Fragment {
                             closeProgressDialog();
                             if ("province".equals(type)) {
                                 queryProvinces();
-                            } else if ("city".equals(type)){
+                            } else if ("city".equals(type)) {
                                 queryCities();
                             } else if ("county".equals(type)) {
                                 queryCounties();
