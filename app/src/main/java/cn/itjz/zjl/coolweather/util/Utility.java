@@ -2,6 +2,8 @@ package cn.itjz.zjl.coolweather.util;
 
 import android.text.TextUtils;
 
+import com.google.gson.Gson;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -9,8 +11,10 @@ import org.json.JSONObject;
 import cn.itjz.zjl.coolweather.db.City;
 import cn.itjz.zjl.coolweather.db.County;
 import cn.itjz.zjl.coolweather.db.Province;
+import cn.itjz.zjl.coolweather.gson.Weather;
 
-/**解析处理服务器返回的JSON格式数据
+/**
+ * 解析处理服务器返回的JSON格式数据
  * Created by zhangjialiang on 17/3/18.
  */
 
@@ -19,7 +23,7 @@ public class Utility {
     /**
      * 解析和处理服务器返回的省级数据
      */
-    public static boolean handleProvinceResponse(String response){
+    public static boolean handleProvinceResponse(String response) {
 
         if (!TextUtils.isEmpty(response)) {
             try {
@@ -65,6 +69,7 @@ public class Utility {
 
     /**
      * 解析处理服务器返回的县级数据
+     *
      * @param response
      * @return
      */
@@ -86,5 +91,25 @@ public class Utility {
             }
         }
         return false;
+    }
+
+    /**
+     * 将返回的json数据解析成Weather实体
+     *
+     * @param response
+     * @return
+     */
+    public static Weather handleWeatherResponse(String response) {
+
+        try {
+            JSONObject jsonObject = new JSONObject(response);
+            JSONArray jsonArray = jsonObject.getJSONArray("HeWeather");
+            String weatherContent = jsonArray.getJSONObject(0).toString();
+            return new Gson().fromJson(weatherContent, Weather.class);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
